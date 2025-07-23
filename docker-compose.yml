@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: trygve-app
+    ports:
+        - "8080:8080" # maps host port 8080 to container port 8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: trygve-db
+    ports:
+      - "3307:3306" # maps host port 3307 to container port 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootsecret
+      - MYSQL_DATABASE=trygve_db
+
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+
+volumes: #like d: c: drives in windows
+    db-data:
