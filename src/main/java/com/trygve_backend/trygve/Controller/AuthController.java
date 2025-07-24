@@ -1,6 +1,7 @@
 package com.trygve_backend.trygve.Controller;
 
 import com.trygve_backend.trygve.DTO.AuthRequestDTO;
+import com.trygve_backend.trygve.DTO.PhoneNumberDTO;
 import com.trygve_backend.trygve.DTO.UserDetailsDTO;
 import com.trygve_backend.trygve.Entity.User;
 import com.trygve_backend.trygve.Service.AuthService;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/user")
@@ -37,6 +40,13 @@ public class AuthController {
         {
             return ResponseEntity.status(404).body(e.getMessage());
         }
+    }
+
+    @PostMapping("check-user")
+    public ResponseEntity<?> checkPhoneNumber(@RequestBody PhoneNumberDTO phoneNumberDTO)
+    {
+        boolean isRegistered = authService.isPhoneNumberRegistered(phoneNumberDTO.getPhoneNumber());
+        return ResponseEntity.ok(Map.of("isRegistered", isRegistered));
     }
 
     @PutMapping("/details")

@@ -7,6 +7,8 @@ import com.trygve_backend.trygve.DTO.UserDetailsDTO;
 import com.trygve_backend.trygve.Entity.User;
 import com.trygve_backend.trygve.Repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,9 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
+    // method to authenticate user using Firebase ID token
     @Transactional
     public User authenticateUser(String idToken)
     {
@@ -36,10 +41,13 @@ public class AuthService {
         }
     }
 
+//      method to get user by id
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
+
+//    method to update user details
     @Transactional
     public User updateUserDetails(UserDetailsDTO userDetailsDTO)
     {
@@ -52,5 +60,14 @@ public class AuthService {
         user.setSecondaryPhoneNumber(userDetailsDTO.getSecondaryPhoneNumber());
 
         return userRepository.save(user);
+    }
+
+//    method to get user if available
+    public boolean isPhoneNumberRegistered(String phoneNumber)
+    {
+        logger.info("Checking registration for phone number: '{}'", phoneNumber);
+        boolean isPresent = userRepository.findByPhoneNumber(phoneNumber).isPresent();
+        logger.info("Is number present in DB: {}", isPresent);
+        return isPresent;
     }
 }
