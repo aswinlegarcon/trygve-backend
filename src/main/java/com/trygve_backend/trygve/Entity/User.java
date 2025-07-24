@@ -14,4 +14,13 @@ public class User {
 
     @Column(unique = true,nullable = false)
     private String phoneNumber;
+
+    private String name;
+
+    @Column(unique = true)
+    private String email;
+
+    private String address;
+
+    private String secondaryPhoneNumber;
 }

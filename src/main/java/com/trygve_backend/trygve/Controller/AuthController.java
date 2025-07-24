@@ -1,6 +1,7 @@
 package com.trygve_backend.trygve.Controller;
 
 import com.trygve_backend.trygve.DTO.AuthRequestDTO;
+import com.trygve_backend.trygve.DTO.UserDetailsDTO;
 import com.trygve_backend.trygve.Entity.User;
 import com.trygve_backend.trygve.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,17 @@ public class AuthController {
             return ResponseEntity.ok(user);
         }catch (RuntimeException e)
         {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/details")
+    public ResponseEntity<?> updateUserDetails(@RequestBody UserDetailsDTO userDetailsDTO)
+    {
+        try {
+            User updatedUser = authService.updateUserDetails(userDetailsDTO);
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }
     }
