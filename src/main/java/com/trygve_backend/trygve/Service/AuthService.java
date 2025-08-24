@@ -56,7 +56,7 @@ public class AuthService {
 
         user.setName(userDetailsDTO.getName());
         user.setEmail(userDetailsDTO.getEmail());
-        user.setAddress(userDetailsDTO.getAddress());
+        user.setAddress(userDetailsDTO.getLocation());
         user.setSecondaryPhoneNumber(userDetailsDTO.getSecondaryPhoneNumber());
 
         return userRepository.save(user);
@@ -69,5 +69,14 @@ public class AuthService {
         boolean isPresent = userRepository.findByPhoneNumber(phoneNumber).isPresent();
         logger.info("Is number present in DB: {}", isPresent);
         return isPresent;
+    }
+
+//    method to delete user by id
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        userRepository.delete(user);
+        logger.info("User with id {} has been deleted", id);
     }
 }
