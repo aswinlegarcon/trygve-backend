@@ -71,6 +71,27 @@ public class AuthService {
         return isPresent;
     }
 
+    public boolean isEmailRegistered(String email)
+    {
+        logger.info("Checking registration for email: '{}'", email);
+        boolean isPresent = userRepository.findByEmail(email).isPresent();
+        logger.info("Is email present in DB: {}", isPresent);
+        return isPresent;
+    }
+
+    public boolean isUserValid(String email,String phoneNumber)
+    {
+        User userByEmail = userRepository.findByEmail(email).orElse(null);
+        User userByPhone = userRepository.findByPhoneNumber(phoneNumber).orElse(null);
+
+        if (userByEmail == null || userByPhone == null) {
+            return false;
+        }
+
+        return userByEmail.getId() == userByPhone.getId();
+    }
+
+
 //    method to delete user by id
     @Transactional
     public void deleteUser(Long id) {
