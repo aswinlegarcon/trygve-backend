@@ -2,9 +2,12 @@ package com.trygve_backend.trygve.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class LoginRequestDTO {
-    private String idToken;
+@AllArgsConstructor
+@NoArgsConstructor
+public class ValidUserRequestDTO {
+    private String email;
     private String phoneNumber;
 }

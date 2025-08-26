@@ -28,6 +28,16 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+        try {
+            LoginResponseDTO response = authService.loginUser(loginRequest);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id)
     {
@@ -55,10 +65,10 @@ public class AuthController {
     }
 
     @PostMapping("/check-user")
-    public ResponseEntity<?> checkUser(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<?> checkUser(@RequestBody ValidUserRequestDTO validUserRequestDTO) {
         boolean belongsToSameUser = authService.isUserValid(
-                loginRequestDTO.getEmail(),
-                loginRequestDTO.getPhoneNumber()
+                validUserRequestDTO.getEmail(),
+                validUserRequestDTO.getPhoneNumber()
         );
         return ResponseEntity.ok(Map.of("belongsToSameUser", belongsToSameUser));
     }
@@ -68,7 +78,7 @@ public class AuthController {
     {
         try {
             User updatedUser = authService.updateUserDetails(userDetailsDTO);
-            AuthResponseDto authResponseDto = new AuthResponseDto();
+            AuthResponseDTO authResponseDto = new AuthResponseDTO();
             if(updatedUser.getEmail()==null || updatedUser.getName()==null || updatedUser.getAddress()==null)
             {
                 authResponseDto.setStatus(false);
