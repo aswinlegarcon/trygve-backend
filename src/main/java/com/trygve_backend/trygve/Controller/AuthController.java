@@ -1,14 +1,10 @@
 package com.trygve_backend.trygve.Controller;
 
-import com.trygve_backend.trygve.DTO.AuthRequestDTO;
-import com.trygve_backend.trygve.DTO.AuthResponseDto;
-import com.trygve_backend.trygve.DTO.PhoneNumberDTO;
-import com.trygve_backend.trygve.DTO.UserDetailsDTO;
+import com.trygve_backend.trygve.DTO.*;
 import com.trygve_backend.trygve.Entity.User;
 import com.trygve_backend.trygve.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -22,13 +18,23 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/auth")
-    public ResponseEntity<?> authenticate(@RequestBody AuthRequestDTO authRequestDTO)
+    public ResponseEntity<?> authenticate(@RequestBody AuthTokenRequestDTO authTokenRequestDTO)
     {
         try{
-            User user = authService.authenticateUser(authRequestDTO.getToken());
+            User user = authService.authenticateUser(authTokenRequestDTO.getToken());
             return ResponseEntity.ok(user);
         }catch (RuntimeException e){
             return ResponseEntity.status(401).body("Authentication failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+        try {
+            LoginResponseDTO response = authService.loginUser(loginRequest);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -44,11 +50,27 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/check-user")
+    @PostMapping("/check-phone")
     public ResponseEntity<?> checkPhoneNumber(@RequestBody PhoneNumberDTO phoneNumberDTO)
     {
         boolean isRegistered = authService.isPhoneNumberRegistered(phoneNumberDTO.getPhoneNumber());
         return ResponseEntity.ok(Map.of("isRegistered", isRegistered));
+    }
+
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestBody EmailDTO emailDTO)
+    {
+        boolean isRegistered = authService.isEmailRegistered(emailDTO.getEmail());
+        return ResponseEntity.ok(Map.of("isRegistered", isRegistered));
+    }
+
+    @PostMapping("/check-user")
+    public ResponseEntity<?> checkUser(@RequestBody ValidUserRequestDTO validUserRequestDTO) {
+        boolean belongsToSameUser = authService.isUserValid(
+                validUserRequestDTO.getEmail(),
+                validUserRequestDTO.getPhoneNumber()
+        );
+        return ResponseEntity.ok(Map.of("belongsToSameUser", belongsToSameUser));
     }
 
     @PutMapping("/register")
@@ -56,7 +78,7 @@ public class AuthController {
     {
         try {
             User updatedUser = authService.updateUserDetails(userDetailsDTO);
-            AuthResponseDto authResponseDto = new AuthResponseDto();
+            AuthResponseDTO authResponseDto = new AuthResponseDTO();
             if(updatedUser.getEmail()==null || updatedUser.getName()==null || updatedUser.getAddress()==null)
             {
                 authResponseDto.setStatus(false);
@@ -80,5 +102,6 @@ public class AuthController {
             return ResponseEntity.status(404).body("User not found " +e.getMessage());
         }
     }
+
 
 }

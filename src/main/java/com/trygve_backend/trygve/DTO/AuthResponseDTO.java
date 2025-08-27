@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AuthResponseDto {
+public class AuthResponseDTO {
     private boolean status;
     private String message;
 }
